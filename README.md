@@ -152,6 +152,12 @@ Your mailing list data never leaves your device. Period.
 - [ ] QR codes on labels
 - [ ] Internationalization
 
+## Deployment
+
+The app is automatically deployed to GitHub Pages on every push to `main`.
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions.
+
 ## Contributing
 
 Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.

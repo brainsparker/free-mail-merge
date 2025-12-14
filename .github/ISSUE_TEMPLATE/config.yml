@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions & Support
+    url: https://github.com/briansparker/free-mail-merge/discussions
+    about: Ask questions and discuss features in GitHub Discussions
+  - name: Documentation
+    url: https://github.com/briansparker/free-mail-merge#readme
+    about: Check the README for usage instructions
