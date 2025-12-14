@@ -58,9 +58,9 @@ export default function CSVImportStep() {
 
   return (
     <div>
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Upload Your CSV File</h2>
-        <p className="text-gray-600">
+      <div className="text-center mb-6 sm:mb-8">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Upload Your CSV File</h2>
+        <p className="text-sm sm:text-base text-gray-600">
           Upload a CSV file containing your mailing addresses
         </p>
       </div>

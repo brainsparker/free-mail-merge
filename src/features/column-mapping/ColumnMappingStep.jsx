@@ -45,9 +45,9 @@ export default function ColumnMappingStep() {
 
   return (
     <div>
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Map Your Columns</h2>
-        <p className="text-gray-600">
+      <div className="text-center mb-6 sm:mb-8">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Map Your Columns</h2>
+        <p className="text-sm sm:text-base text-gray-600">
           Match your CSV columns to label fields
         </p>
       </div>

@@ -23,14 +23,14 @@ function WizardContent() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex justify-between items-center">
+        <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6">
+          <div className="flex justify-between items-center flex-wrap gap-2">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">LabelMerge</h1>
-              <p className="text-sm text-gray-600 mt-1">Free, privacy-first CSV to label printing</p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">LabelMerge</h1>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1">Free, privacy-first CSV to label printing</p>
             </div>
             {currentStep > 1 && (
-              <Button variant="ghost" onClick={resetWizard}>
+              <Button variant="ghost" onClick={resetWizard} className="text-sm">
                 Start Over
               </Button>
             )}
@@ -39,21 +39,22 @@ function WizardContent() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-5xl mx-auto px-4 py-8">
+      <main className="max-w-5xl mx-auto px-4 py-4 sm:py-8">
         {/* Progress Steps */}
         <ProgressSteps currentStep={currentStep} steps={WIZARD_STEPS} />
 
         {/* Step Content */}
-        <div className="bg-white rounded-lg shadow-lg p-8 min-h-[400px]">
+        <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 lg:p-8 min-h-[300px] sm:min-h-[400px]">
           <CurrentStepComponent />
         </div>
 
         {/* Navigation Buttons */}
-        <div className="flex justify-between mt-6">
+        <div className="flex justify-between gap-3 mt-6">
           <Button
             variant="secondary"
             onClick={prevStep}
             disabled={currentStep === 1}
+            className="flex-1 sm:flex-none"
           >
             Back
           </Button>
@@ -61,6 +62,7 @@ function WizardContent() {
             variant="primary"
             onClick={nextStep}
             disabled={!canGoNext() || currentStep === 4}
+            className="flex-1 sm:flex-none"
           >
             {currentStep === 4 ? 'Done' : 'Next'}
           </Button>

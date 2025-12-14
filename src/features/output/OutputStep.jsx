@@ -76,38 +76,38 @@ export default function OutputStep() {
 
   return (
     <div>
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Download Your Labels</h2>
-        <p className="text-gray-600">
+      <div className="text-center mb-6 sm:mb-8">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Download Your Labels</h2>
+        <p className="text-sm sm:text-base text-gray-600">
           Your labels are ready to print
         </p>
       </div>
 
       {/* Summary Card */}
-      <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-8 mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+      <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-4 sm:p-6 md:p-8 mb-6 sm:mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 text-center">
           <div>
-            <div className="text-4xl font-bold text-blue-900">{labelCount}</div>
-            <div className="text-sm text-blue-700 mt-1">Total Labels</div>
+            <div className="text-3xl sm:text-4xl font-bold text-blue-900">{labelCount}</div>
+            <div className="text-xs sm:text-sm text-blue-700 mt-1">Total Labels</div>
           </div>
           <div>
-            <div className="text-4xl font-bold text-blue-900">{sheetsNeeded}</div>
-            <div className="text-sm text-blue-700 mt-1">Sheets Needed</div>
+            <div className="text-3xl sm:text-4xl font-bold text-blue-900">{sheetsNeeded}</div>
+            <div className="text-xs sm:text-sm text-blue-700 mt-1">Sheets Needed</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-blue-900">{format.name}</div>
-            <div className="text-sm text-blue-700 mt-1">Label Format</div>
+            <div className="text-xl sm:text-2xl font-bold text-blue-900">{format.name}</div>
+            <div className="text-xs sm:text-sm text-blue-700 mt-1">Label Format</div>
           </div>
         </div>
       </div>
 
       {/* Download Buttons */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8">
         <Button
           variant="primary"
           onClick={handleDownload}
           disabled={isGenerating}
-          className="px-8 py-3 text-lg"
+          className="px-6 sm:px-8 py-3 text-base sm:text-lg w-full sm:w-auto"
         >
           {isGenerating ? (
             <>
@@ -138,7 +138,7 @@ export default function OutputStep() {
           variant="secondary"
           onClick={handlePrintPreview}
           disabled={isGenerating}
-          className="px-8 py-3 text-lg"
+          className="px-6 sm:px-8 py-3 text-base sm:text-lg w-full sm:w-auto"
         >
           <svg
             className="w-5 h-5 inline-block mr-2"
