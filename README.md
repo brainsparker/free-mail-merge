@@ -18,7 +18,7 @@
 
 ### Option 1: Use Online (Recommended)
 
-Visit **[https://yourdomain.com/free-mail-merge](https://yourdomain.com/free-mail-merge)** (coming soon after deployment)
+Visit **[https://briansparker.github.io/free-mail-merge](https://briansparker.github.io/free-mail-merge)**
 
 ### Option 2: Run Locally
 
