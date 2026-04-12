@@ -2,6 +2,32 @@ import Papa from 'papaparse';
 
 const MAX_ROWS = 10000;
 
+function normalizeHeader(header) {
+  if (typeof header !== 'string') return '';
+  return header.replace(/^\uFEFF/, '').trim();
+}
+
+function normalizeCellValue(value) {
+  if (value == null) return '';
+  if (typeof value === 'string') return value.trim();
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value).trim();
+  return '';
+}
+
+function sanitizeRow(row, headers) {
+  const sanitized = {};
+
+  headers.forEach((header) => {
+    sanitized[header] = normalizeCellValue(row?.[header]);
+  });
+
+  return sanitized;
+}
+
+function hasMeaningfulData(row, headers) {
+  return headers.some((header) => normalizeCellValue(row?.[header]) !== '');
+}
+
 /**
  * Parse a CSV file using PapaParse
  * @param {File} file - The CSV file to parse
@@ -32,16 +58,25 @@ export function parseCSV(file) {
           }
         }
 
-        const headers = results.meta.fields || [];
-        const rows = results.data.filter((row) => {
-          // Filter out completely empty rows
-          return Object.values(row).some((val) => val && val.trim() !== '');
-        });
+        const rawHeaders = results.meta.fields || [];
+        const headers = rawHeaders
+          .map(normalizeHeader)
+          .filter((header) => header !== '');
 
         if (headers.length === 0) {
           reject(new Error('No columns found in CSV file'));
           return;
         }
+
+        const uniqueHeaders = new Set(headers.map((header) => header.toLowerCase()));
+        if (uniqueHeaders.size !== headers.length) {
+          reject(new Error('CSV contains duplicate column headers after trimming'));
+          return;
+        }
+
+        const rows = results.data
+          .map((row) => sanitizeRow(row, headers))
+          .filter((row) => hasMeaningfulData(row, headers));
 
         if (rows.length === 0) {
           reject(new Error('No data rows found in CSV file'));
@@ -91,3 +126,10 @@ export function formatFileSize(bytes) {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
 }
+
+export const __csvParserInternals = {
+  normalizeHeader,
+  normalizeCellValue,
+  sanitizeRow,
+  hasMeaningfulData
+};

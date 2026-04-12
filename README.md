@@ -65,6 +65,7 @@ See [`sample-addresses.csv`](./sample-addresses.csv) for a full example.
 
 - Drag and drop your CSV file, or click to browse
 - Maximum 10,000 rows supported
+- Column headers are normalized (trimmed/BOM removed) and must be unique
 
 ### Step 3: Map Your Columns
 
