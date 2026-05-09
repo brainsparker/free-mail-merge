@@ -2,6 +2,10 @@ import Papa from 'papaparse';
 
 const MAX_ROWS = 10000;
 
+function normalizeHeader(header) {
+  return String(header || '').trim();
+}
+
 /**
  * Parse a CSV file using PapaParse
  * @param {File} file - The CSV file to parse
@@ -32,10 +36,28 @@ export function parseCSV(file) {
           }
         }
 
-        const headers = results.meta.fields || [];
+        const rawHeaders = results.meta.fields || [];
+        const headers = rawHeaders.map(normalizeHeader).filter(Boolean);
+
+        if (headers.length !== rawHeaders.length) {
+          reject(new Error('CSV contains empty column headers. Please add names to all columns.'));
+          return;
+        }
+
+        const duplicateHeaders = headers.filter((header, index) => headers.indexOf(header) !== index);
+        if (duplicateHeaders.length > 0) {
+          reject(new Error(`CSV has duplicate column headers: ${[...new Set(duplicateHeaders)].join(', ')}`));
+          return;
+        }
+
+        if (results.data.length >= MAX_ROWS) {
+          reject(new Error(`CSV exceeds ${MAX_ROWS.toLocaleString()} row limit. Please split your file into smaller batches.`));
+          return;
+        }
+
         const rows = results.data.filter((row) => {
           // Filter out completely empty rows
-          return Object.values(row).some((val) => val && val.trim() !== '');
+          return Object.values(row).some((val) => val && String(val).trim() !== '');
         });
 
         if (headers.length === 0) {
