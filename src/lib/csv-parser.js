@@ -55,10 +55,24 @@ export function parseCSV(file) {
           return;
         }
 
-        const rows = results.data.filter((row) => {
-          // Filter out completely empty rows
-          return Object.values(row).some((val) => val && String(val).trim() !== '');
-        });
+        const headerMap = new Map(rawHeaders.map((header) => [header, normalizeHeader(header)]));
+
+        const rows = results.data
+          .map((row) => {
+            const normalizedRow = {};
+
+            for (const [rawKey, value] of Object.entries(row || {})) {
+              const normalizedKey = headerMap.get(rawKey) ?? normalizeHeader(rawKey);
+              if (!normalizedKey) continue;
+              normalizedRow[normalizedKey] = value;
+            }
+
+            return normalizedRow;
+          })
+          .filter((row) => {
+            // Filter out completely empty rows
+            return Object.values(row).some((val) => val && String(val).trim() !== '');
+          });
 
         if (headers.length === 0) {
           reject(new Error('No columns found in CSV file'));
