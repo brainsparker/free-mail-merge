@@ -1,5 +1,6 @@
 import { createContext, useContext, useReducer, useEffect } from 'react';
 import { DEFAULT_FORMAT } from '../constants/label-formats';
+import { DEFAULT_PRINT_SETTINGS } from '../lib/label-generator';
 
 const AppContext = createContext(null);
 
@@ -27,6 +28,9 @@ const initialState = {
   // Step 3: Label Format
   selectedFormat: DEFAULT_FORMAT,
 
+  // Step 4: Print alignment (start position on a partly used sheet, printer offset nudge)
+  printSettings: { ...DEFAULT_PRINT_SETTINGS },
+
   // Wizard navigation
   currentStep: 1,
   completedSteps: []
@@ -37,6 +41,7 @@ const actionTypes = {
   SET_COLUMN_MAPPING: 'SET_COLUMN_MAPPING',
   SET_AUTO_DETECTION: 'SET_AUTO_DETECTION',
   SET_SELECTED_FORMAT: 'SET_SELECTED_FORMAT',
+  SET_PRINT_SETTINGS: 'SET_PRINT_SETTINGS',
   SET_CURRENT_STEP: 'SET_CURRENT_STEP',
   MARK_STEP_COMPLETE: 'MARK_STEP_COMPLETE',
   RESET_STATE: 'RESET_STATE',
@@ -76,6 +81,15 @@ function appReducer(state, action) {
         selectedFormat: action.payload
       };
 
+    case actionTypes.SET_PRINT_SETTINGS:
+      return {
+        ...state,
+        printSettings: {
+          ...state.printSettings,
+          ...action.payload
+        }
+      };
+
     case actionTypes.SET_CURRENT_STEP:
       return {
         ...state,
@@ -94,13 +108,25 @@ function appReducer(state, action) {
     case actionTypes.RESET_STATE:
       return {
         ...initialState,
-        selectedFormat: DEFAULT_FORMAT
+        selectedFormat: DEFAULT_FORMAT,
+        // Offsets describe the printer, not the mailing list, so they survive Start Over.
+        printSettings: {
+          ...DEFAULT_PRINT_SETTINGS,
+          offsetX: state.printSettings?.offsetX ?? 0,
+          offsetY: state.printSettings?.offsetY ?? 0
+        }
       };
 
     case actionTypes.LOAD_STATE:
       return {
         ...state,
-        ...action.payload
+        ...action.payload,
+        // State saved before print settings existed has no printSettings key;
+        // keep the defaults underneath whatever was stored.
+        printSettings: {
+          ...DEFAULT_PRINT_SETTINGS,
+          ...(action.payload?.printSettings || {})
+        }
       };
 
     default:
