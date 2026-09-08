@@ -10,7 +10,8 @@
 - ✅ **Free Forever** - No accounts, no subscriptions, no hidden costs.
 - ✅ **Simple 4-Step Wizard** - Upload CSV → Map Columns → Select Format → Download
 - ✅ **Auto-Detection** - Automatically matches common column names
-- ✅ **Supports Avery Labels** - 5160, 5163, 5164, 5167 formats
+- ✅ **Supports Avery Labels** - 5160, 5161, 5162, 5163, 5164, 5167, 5195 (US Letter) and L7160, L7163 (A4), plus their 8xxx/5x6x/J8xxx twins
+- ✅ **Print Alignment Tools** - Start on any label of a partly used sheet, nudge the layout to match your printer, and print a plain-paper alignment test page
 - ✅ **Offline Capable** - Works without internet after first load
 - ✅ **Mobile Responsive** - Use on desktop, tablet, or mobile
 
@@ -32,6 +33,9 @@ npm install
 
 # Start dev server
 npm run dev
+
+# Run the tests (no extra dependencies, uses the Node test runner)
+npm test
 
 # Build for production
 npm run build
@@ -74,42 +78,46 @@ See [`sample-addresses.csv`](./sample-addresses.csv) for a full example.
 
 ### Step 4: Choose Label Format
 
-Select your Avery label format:
-- **5160** - 1" × 2⅝" (30 labels per sheet) - Address Labels
-- **5163** - 2" × 4" (10 labels per sheet) - Shipping Labels
-- **5164** - 3⅓" × 4" (6 labels per sheet) - Shipping Labels
-- **5167** - ½" × 1¾" (80 labels per sheet) - Return Address Labels
+Select the label format that matches your sheets. Each card lists the other product codes that share the same layout (for example 8160 and 5260 use the 5160 grid), so pick by the number printed on your box.
 
-### Step 5: Download & Print
+### Step 5: Align, Download & Print
 
-1. Click **"Download HTML"** to save the label file
-2. Open the HTML file in your browser
-3. Configure print settings:
-   - Scale: **Actual Size** (NOT "Fit to Page")
-   - Margins: **None** or **Minimum**
+1. Under **Print alignment**, pick **Start at label** if your first sheet is partly used. Positions count left to right, then top to bottom; earlier positions are left blank.
+2. Click **"Print alignment test page"** and print it on plain paper. It draws a dashed outline for every label position using the exact geometry of your labels.
+3. Hold the test page against a label sheet. If the outlines sit off the labels, adjust the **horizontal** and **vertical nudge** (in inches for Letter formats, millimetres for A4) and print the test page again. Positive values move everything right or down.
+4. Click **"Download HTML"** to save the label file, or **"Print Preview"** to print straight from the browser.
+5. Configure print settings:
+   - Scale: **Actual Size** or **100%** (NOT "Fit to Page")
+   - Margins: **None** or **Default** (the file sets its own page margins)
    - Orientation: **Portrait**
-   - Paper: **Letter (8.5" × 11")**
-4. Print a test page on plain paper first
-5. Load your Avery label sheets and print
+   - Paper: **Letter (8.5" × 11")** or **A4** to match the format
+6. Load your label sheets and print
+
+Nudge values are saved in your browser, so once a printer is dialled in you do not have to repeat the test.
 
 ## Print Accuracy Tips
 
 - ✅ Use genuine Avery label sheets that match your selected format
-- ✅ Print a test page first to verify alignment
+- ✅ Print the alignment test page on plain paper first and hold it against a label sheet
 - ✅ Set printer to "Actual Size" (100% scale)
-- ✅ Use minimum or no margins
+- ✅ Use the nudge controls to correct a consistent shift instead of fighting printer margins
 - ⚠️ Browser differences: Chrome generally has the most accurate print rendering
 
 ## Supported Label Formats
 
-| Format | Size | Labels/Sheet | Use Case |
-|--------|------|--------------|----------|
-| Avery 5160 | 1" × 2⅝" | 30 | Standard address labels |
-| Avery 5163 | 2" × 4" | 10 | Shipping labels |
-| Avery 5164 | 3⅓" × 4" | 6 | Large shipping labels |
-| Avery 5167 | ½" × 1¾" | 80 | Return address labels |
+| Format | Also fits | Paper | Size | Labels/Sheet | Use Case |
+|--------|-----------|-------|------|--------------|----------|
+| Avery 5160 | 8160, 5260, 5960, 18160, 8460 | Letter | 1" × 2⅝" | 30 | Standard address labels |
+| Avery 5161 | 8161, 5261, 5961, 18161 | Letter | 1" × 4" | 20 | Wide address labels |
+| Avery 5162 | 8162, 5262, 5962, 18162 | Letter | 1⅓" × 4" | 14 | Address labels |
+| Avery 5163 | 8163, 5263, 5963, 18163 | Letter | 2" × 4" | 10 | Shipping labels |
+| Avery 5164 | 8164, 5264, 5964 | Letter | 3⅓" × 4" | 6 | Large shipping labels |
+| Avery 5167 | 8167, 5267, 5967, 18167 | Letter | ½" × 1¾" | 80 | Return address labels |
+| Avery 5195 | 8195, 5155, 18195 | Letter | ⅔" × 1¾" | 60 | Return address labels |
+| Avery L7160 | J8160, L7560, L7660, L7960 | A4 | 63.5 × 38.1 mm | 21 | Address labels (UK/EU) |
+| Avery L7163 | J8163, L7563, L7663, L7963 | A4 | 99.1 × 38.1 mm | 14 | Address labels (UK/EU) |
 
-More formats coming in future versions!
+Every format's geometry is checked by the test suite: columns must span the page width exactly and rows must fit the page height. To add a format, copy an entry in `src/constants/label-formats.js`, fill in the vendor's published margins and pitch, and run `npm test`.
 
 ## Privacy & Security
 
@@ -170,6 +178,9 @@ npm install
 
 # Run dev server with hot reload
 npm run dev
+
+# Run the tests (no extra dependencies, uses the Node test runner)
+npm test
 
 # Build for production
 npm run build
