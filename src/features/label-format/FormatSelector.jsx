@@ -27,6 +27,16 @@ export default function FormatSelector({ selectedFormat, onSelectFormat }) {
                 <p className="text-sm text-gray-600 mb-3">{format.description}</p>
 
                 <div className="space-y-1 text-sm text-gray-700">
+                  {format.aliases && format.aliases.length > 0 && (
+                    <div className="flex items-center">
+                      <span className="font-medium mr-2">Also fits:</span>
+                      <span>{format.aliases.join(', ')}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center">
+                    <span className="font-medium mr-2">Paper:</span>
+                    <span>{format.paper}</span>
+                  </div>
                   <div className="flex items-center">
                     <span className="font-medium mr-2">Labels per sheet:</span>
                     <span>{format.labelsPerSheet}</span>
