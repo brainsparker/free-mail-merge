@@ -9,6 +9,8 @@
 - ✅ **100% Privacy** - All processing happens in your browser. No data uploads, no tracking.
 - ✅ **Free Forever** - No accounts, no subscriptions, no hidden costs.
 - ✅ **Simple 4-Step Wizard** - Upload CSV → Map Columns → Select Format → Download
+- ✅ **Print-Ready PDF** - Fixed page geometry that prints the same from any viewer, generated in your browser with no external libraries
+- ✅ **Alignment Test Page** - Print it on plain paper to check your printer before using label sheets
 - ✅ **Auto-Detection** - Automatically matches common column names
 - ✅ **Supports Avery Labels** - 5160, 5163, 5164, 5167 formats
 - ✅ **Offline Capable** - Works without internet after first load
@@ -82,23 +84,23 @@ Select your Avery label format:
 
 ### Step 5: Download & Print
 
-1. Click **"Download HTML"** to save the label file
-2. Open the HTML file in your browser
-3. Configure print settings:
-   - Scale: **Actual Size** (NOT "Fit to Page")
-   - Margins: **None** or **Minimum**
-   - Orientation: **Portrait**
-   - Paper: **Letter (8.5" × 11")**
-4. Print a test page on plain paper first
+1. Click **"Download PDF"** to save your labels as a print-ready PDF
+2. Open the PDF in any PDF viewer (Preview, Adobe Reader, Chrome, Edge)
+3. Print with scale set to **100% / Actual Size** (NOT "Fit to Page" or "Shrink to fit")
+4. Print the **Alignment Test** PDF on plain paper first and hold it against a label sheet
 5. Load your Avery label sheets and print
+
+The PDF fixes the page size and every label position in absolute measurements, so it prints the same from any viewer. It is generated entirely in your browser with no external libraries or services.
+
+**Prefer HTML?** "Download HTML" is still available. Open the file in your browser and set scale to Actual Size, margins to None or Minimum, Portrait orientation and Letter paper. HTML output is more sensitive to browser print settings (margins, injected headers and footers) than the PDF.
 
 ## Print Accuracy Tips
 
 - ✅ Use genuine Avery label sheets that match your selected format
-- ✅ Print a test page first to verify alignment
+- ✅ Print the alignment test on plain paper first to verify alignment
 - ✅ Set printer to "Actual Size" (100% scale)
-- ✅ Use minimum or no margins
-- ⚠️ Browser differences: Chrome generally has the most accurate print rendering
+- ✅ Prefer the PDF: it is immune to browser print margins and header/footer insertion
+- ⚠️ If using the HTML output, Chrome generally has the most accurate print rendering
 
 ## Supported Label Formats
 
@@ -129,7 +131,16 @@ Your mailing list data never leaves your device. Period.
 - **Vite** - Build tool
 - **Tailwind CSS** - Styling
 - **PapaParse** - CSV parsing
+- **Built-in PDF writer** - Zero-dependency PDF output (`src/lib/pdf-writer.js`), Helvetica base font, no network
 - **Service Worker** - Offline support
+
+## Tests
+
+```bash
+npm test
+```
+
+Runs the Node test suite (`tests/`) covering the PDF writer and the label layout. No extra dependencies are needed.
 
 ## Browser Support
 
@@ -141,7 +152,7 @@ Your mailing list data never leaves your device. Period.
 ## Roadmap
 
 ### v1.5 (Planned)
-- [ ] PDF export (client-side)
+- [x] PDF export (client-side)
 - [ ] Custom label formats
 - [ ] Font and formatting options
 - [ ] Duplicate detection

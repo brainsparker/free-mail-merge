@@ -1,15 +1,20 @@
-import { LABEL_FORMATS } from '../constants/label-formats';
+import { LABEL_FORMATS } from '../constants/label-formats.js';
 
 /**
- * Escape HTML entities to prevent XSS
+ * Escape HTML entities to prevent XSS.
+ * Pure string replacement so this module also runs outside a browser
+ * (tests execute it under Node).
  * @param {string} text
  * @returns {string}
  */
-function escapeHtml(text) {
-  if (!text) return '';
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
+export function escapeHtml(text) {
+  if (text === null || text === undefined) return '';
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 /**
@@ -18,7 +23,7 @@ function escapeHtml(text) {
  * @param {Object} columnMapping - Column mapping configuration
  * @returns {string[]}
  */
-function generateAddressLines(row, columnMapping) {
+export function generateAddressLines(row, columnMapping) {
   const lines = [];
 
   // Name
