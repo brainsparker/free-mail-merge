@@ -1,6 +1,6 @@
 /**
- * Trigger browser download for a text file
- * @param {string} content - File content
+ * Trigger browser download for a text or binary file
+ * @param {string|Uint8Array|Blob} content - File content
  * @param {string} filename - Desired filename
  * @param {string} mimeType - MIME type (default: text/html)
  */
@@ -26,9 +26,11 @@ export function downloadFile(content, filename, mimeType = 'text/html') {
 /**
  * Generate filename with timestamp
  * @param {string} formatKey - Label format key
+ * @param {string} [extension='html'] - File extension without the dot
+ * @param {string} [prefix='labels'] - Leading part of the name
  * @returns {string}
  */
-export function generateFilename(formatKey) {
+export function generateFilename(formatKey, extension = 'html', prefix = 'labels') {
   const timestamp = new Date().toISOString().slice(0, 10);
-  return `labels-${formatKey}-${timestamp}.html`;
+  return `${prefix}-${formatKey}-${timestamp}.${extension}`;
 }

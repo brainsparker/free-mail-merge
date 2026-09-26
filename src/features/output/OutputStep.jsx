@@ -2,8 +2,11 @@ import { useState, useMemo } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import { LABEL_FORMATS } from '../../constants/label-formats';
 import { generatePrintableHTML, countLabels } from '../../lib/label-generator';
+import { generateLabelPDF, generateAlignmentTestPDF } from '../../lib/label-pdf';
 import { downloadFile, generateFilename } from '../../lib/file-download';
 import Button from '../../components/ui/Button';
+
+const PDF_MIME = 'application/pdf';
 
 export default function OutputStep() {
   const { state } = useAppContext();
@@ -19,6 +22,40 @@ export default function OutputStep() {
 
   // Calculate number of sheets needed
   const sheetsNeeded = format ? Math.ceil(labelCount / format.labelsPerSheet) : 0;
+
+  const handleDownloadPdf = async () => {
+    setIsGenerating(true);
+    setError(null);
+
+    try {
+      // Small delay for UI feedback
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      const pdf = generateLabelPDF(
+        state.csvData.rows,
+        state.columnMapping,
+        state.selectedFormat
+      );
+
+      downloadFile(pdf, generateFilename(state.selectedFormat, 'pdf'), PDF_MIME);
+
+      setIsGenerating(false);
+    } catch (err) {
+      setError(err.message);
+      setIsGenerating(false);
+    }
+  };
+
+  const handleAlignmentTest = () => {
+    setError(null);
+
+    try {
+      const pdf = generateAlignmentTestPDF(state.selectedFormat);
+      downloadFile(pdf, generateFilename(state.selectedFormat, 'pdf', 'alignment-test'), PDF_MIME);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   const handleDownload = async () => {
     setIsGenerating(true);
@@ -102,10 +139,10 @@ export default function OutputStep() {
       </div>
 
       {/* Download Buttons */}
-      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-3">
         <Button
           variant="primary"
-          onClick={handleDownload}
+          onClick={handleDownloadPdf}
           disabled={isGenerating}
           className="px-6 sm:px-8 py-3 text-base sm:text-lg w-full sm:w-auto"
         >
@@ -129,9 +166,18 @@ export default function OutputStep() {
                   d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                 />
               </svg>
-              Download HTML
+              Download PDF
             </>
           )}
+        </Button>
+
+        <Button
+          variant="secondary"
+          onClick={handleDownload}
+          disabled={isGenerating}
+          className="px-6 sm:px-8 py-3 text-base sm:text-lg w-full sm:w-auto"
+        >
+          Download HTML
         </Button>
 
         <Button
@@ -155,6 +201,16 @@ export default function OutputStep() {
           </svg>
           Print Preview
         </Button>
+      </div>
+
+      <div className="text-center mb-8">
+        <button
+          type="button"
+          onClick={handleAlignmentTest}
+          className="text-sm text-blue-700 underline underline-offset-2 hover:text-blue-900"
+        >
+          Download alignment test (PDF) to print on plain paper first
+        </button>
       </div>
 
       {error && (
@@ -189,24 +245,27 @@ export default function OutputStep() {
             <strong>Load label sheets:</strong> Use {format.name} label sheets ({format.labelsPerSheet} labels per sheet)
           </li>
           <li>
-            <strong>Open downloaded file:</strong> Open the HTML file in your web browser
+            <strong>Open the PDF:</strong> Any PDF viewer works (Preview, Adobe Reader, Chrome, Edge)
           </li>
           <li>
             <strong>Print settings:</strong>
             <ul className="ml-6 mt-1 space-y-1 list-disc list-inside">
-              <li>Set scale to "Actual Size" or "100%" (NOT "Fit to Page")</li>
-              <li>Set margins to "None" or "Minimum"</li>
+              <li>Set scale to "Actual Size" or "100%" (NOT "Fit to Page" or "Shrink to fit")</li>
               <li>Orientation: Portrait</li>
               <li>Paper size: Letter (8.5" × 11")</li>
             </ul>
           </li>
           <li>
-            <strong>Test first:</strong> Print page 1 only on plain paper to verify alignment
+            <strong>Test first:</strong> Print the alignment test on plain paper and hold it against a label sheet
           </li>
           <li>
-            <strong>Adjust if needed:</strong> If misaligned, adjust printer margins slightly
+            <strong>Adjust if needed:</strong> If misaligned, check that scaling is off in both the viewer and the printer driver
           </li>
         </ol>
+        <p className="mt-3 text-xs text-yellow-800">
+          The PDF fixes every label position in absolute measurements, so it is not affected by browser print margins or
+          headers and footers. If you use the HTML download instead, also set margins to "None" or "Minimum".
+        </p>
       </div>
 
       {/* Privacy Notice */}
