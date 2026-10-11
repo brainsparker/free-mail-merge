@@ -10,6 +10,8 @@
 - ✅ **Free Forever** - No accounts, no subscriptions, no hidden costs.
 - ✅ **Simple 4-Step Wizard** - Upload CSV → Map Columns → Select Format → Download
 - ✅ **Auto-Detection** - Automatically matches common column names
+- ✅ **Duplicate Detection** - Finds rows that would print the same label twice and removes them with one click (household members at a shared address are kept)
+- ✅ **USPS Formatting** - Optional one-click formatting to USPS automation style: uppercase, no punctuation, two-letter state codes, ZIP+4
 - ✅ **Supports Avery Labels** - 5160, 5163, 5164, 5167 formats
 - ✅ **Offline Capable** - Works without internet after first load
 - ✅ **Mobile Responsive** - Use on desktop, tablet, or mobile
@@ -71,6 +73,12 @@ See [`sample-addresses.csv`](./sample-addresses.csv) for a full example.
 - Review the auto-detected column mappings
 - Adjust as needed using the dropdown selectors
 - Required fields are marked with *
+
+Once the required fields are mapped, a **Clean up your list** panel appears below the mapper:
+
+- **Duplicates.** LabelMerge compares name, company and address on every row, ignoring case, punctuation, ZIP+4 and common spelling variants (St/Street, Ave/Avenue, Apt/Apartment, N/North). Rows that would print an identical label are listed, and **Remove duplicates** skips them in the print run. The first copy is always kept, and **Restore** brings the others back. Two people at the same address are not duplicates and are never removed.
+- **USPS formatting.** Tick **Format addresses for USPS automation** to print labels the way the USPS Postal Addressing Standards (Publication 28) describe them: uppercase, no punctuation, two-letter state codes, ZIP+4 with a hyphen, and `CITY ST  ZIP` on the last line. The live preview updates as you toggle it. Addresses without a US state and ZIP are left as written, so mixed US and international lists are safe.
+- A note appears if some rows have postal codes that are not 5 or 9 digit US ZIPs. That is expected for international mail and worth a look otherwise.
 
 ### Step 4: Choose Label Format
 
@@ -144,7 +152,8 @@ Your mailing list data never leaves your device. Period.
 - [ ] PDF export (client-side)
 - [ ] Custom label formats
 - [ ] Font and formatting options
-- [ ] Duplicate detection
+- [x] Duplicate detection
+- [x] USPS address formatting
 
 ### v2.0 (Future)
 - [ ] Save/load mapping templates
@@ -176,6 +185,9 @@ npm run build
 
 # Preview production build
 npm run preview
+
+# Run unit tests (Node 20+, no extra dependencies)
+npm test
 ```
 
 ## License

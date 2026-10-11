@@ -1,4 +1,5 @@
 import { LABEL_FORMATS } from '../constants/label-formats';
+import { buildAddressLines } from './list-cleaner';
 
 /**
  * Escape HTML entities to prevent XSS
@@ -16,45 +17,11 @@ function escapeHtml(text) {
  * Generate address lines from mapped data
  * @param {Object} row - CSV row data
  * @param {Object} columnMapping - Column mapping configuration
+ * @param {{ usps?: boolean }} [options] - Rendering options (USPS formatting)
  * @returns {string[]}
  */
-function generateAddressLines(row, columnMapping) {
-  const lines = [];
-
-  // Name
-  if (columnMapping.name && row[columnMapping.name]) {
-    lines.push(row[columnMapping.name]);
-  }
-
-  // Company
-  if (columnMapping.company && row[columnMapping.company]) {
-    lines.push(row[columnMapping.company]);
-  }
-
-  // Address Line 1
-  if (columnMapping.addressLine1 && row[columnMapping.addressLine1]) {
-    lines.push(row[columnMapping.addressLine1]);
-  }
-
-  // Address Line 2
-  if (columnMapping.addressLine2 && row[columnMapping.addressLine2]) {
-    lines.push(row[columnMapping.addressLine2]);
-  }
-
-  // City, State ZIP
-  const cityStateLine = [
-    row[columnMapping.city],
-    row[columnMapping.state],
-    row[columnMapping.zip]
-  ]
-    .filter(Boolean)
-    .join(', ');
-
-  if (cityStateLine) {
-    lines.push(cityStateLine);
-  }
-
-  return lines.filter(Boolean);
+function generateAddressLines(row, columnMapping, options = {}) {
+  return buildAddressLines(row, columnMapping, options);
 }
 
 /**
@@ -125,9 +92,10 @@ function generateCSS(formatSpec) {
  * @param {Object[]} rows - CSV data rows
  * @param {Object} columnMapping - Column mapping configuration
  * @param {string} formatKey - Selected format key (e.g., '5160')
+ * @param {{ usps?: boolean }} [options] - Rendering options (USPS formatting)
  * @returns {string} - Complete HTML document
  */
-export function generatePrintableHTML(rows, columnMapping, formatKey) {
+export function generatePrintableHTML(rows, columnMapping, formatKey, options = {}) {
   const formatSpec = LABEL_FORMATS[formatKey];
 
   if (!formatSpec) {
@@ -137,7 +105,7 @@ export function generatePrintableHTML(rows, columnMapping, formatKey) {
   // Generate labels HTML
   const labelsHTML = rows
     .map((row) => {
-      const addressLines = generateAddressLines(row, columnMapping);
+      const addressLines = generateAddressLines(row, columnMapping, options);
 
       // Skip if no address lines
       if (addressLines.length === 0) {
@@ -177,11 +145,12 @@ export function generatePrintableHTML(rows, columnMapping, formatKey) {
  * Count total labels that will be generated
  * @param {Object[]} rows - CSV data rows
  * @param {Object} columnMapping - Column mapping configuration
+ * @param {{ usps?: boolean }} [options] - Rendering options (USPS formatting)
  * @returns {number}
  */
-export function countLabels(rows, columnMapping) {
+export function countLabels(rows, columnMapping, options = {}) {
   return rows.filter((row) => {
-    const addressLines = generateAddressLines(row, columnMapping);
+    const addressLines = generateAddressLines(row, columnMapping, options);
     return addressLines.length > 0;
   }).length;
 }
