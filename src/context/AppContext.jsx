@@ -1,5 +1,6 @@
-import { createContext, useContext, useReducer, useEffect } from 'react';
+import { createContext, useContext, useReducer, useEffect, useMemo } from 'react';
 import { DEFAULT_FORMAT } from '../constants/label-formats';
+import { getActiveRows } from '../lib/list-cleaner';
 
 const AppContext = createContext(null);
 
@@ -24,6 +25,12 @@ const initialState = {
   },
   autoDetectionConfidence: {},
 
+  // Step 2b: List cleanup (duplicate removal and USPS formatting)
+  listCleanup: {
+    excludedRowIndexes: [],
+    uspsFormat: false
+  },
+
   // Step 3: Label Format
   selectedFormat: DEFAULT_FORMAT,
 
@@ -37,6 +44,8 @@ const actionTypes = {
   SET_COLUMN_MAPPING: 'SET_COLUMN_MAPPING',
   SET_AUTO_DETECTION: 'SET_AUTO_DETECTION',
   SET_SELECTED_FORMAT: 'SET_SELECTED_FORMAT',
+  SET_EXCLUDED_ROWS: 'SET_EXCLUDED_ROWS',
+  SET_USPS_FORMAT: 'SET_USPS_FORMAT',
   SET_CURRENT_STEP: 'SET_CURRENT_STEP',
   MARK_STEP_COMPLETE: 'MARK_STEP_COMPLETE',
   RESET_STATE: 'RESET_STATE',
@@ -46,17 +55,45 @@ const actionTypes = {
 function appReducer(state, action) {
   switch (action.type) {
     case actionTypes.SET_CSV_DATA:
+      // New data means old row indexes no longer point at the same rows.
       return {
         ...state,
-        csvData: action.payload
+        csvData: action.payload,
+        listCleanup: {
+          ...state.listCleanup,
+          excludedRowIndexes: []
+        }
       };
 
     case actionTypes.SET_COLUMN_MAPPING:
+      // Duplicates are defined by the mapping, so a mapping change clears them.
       return {
         ...state,
         columnMapping: {
           ...state.columnMapping,
           ...action.payload
+        },
+        listCleanup: {
+          ...state.listCleanup,
+          excludedRowIndexes: []
+        }
+      };
+
+    case actionTypes.SET_EXCLUDED_ROWS:
+      return {
+        ...state,
+        listCleanup: {
+          ...state.listCleanup,
+          excludedRowIndexes: Array.from(new Set(action.payload)).sort((a, b) => a - b)
+        }
+      };
+
+    case actionTypes.SET_USPS_FORMAT:
+      return {
+        ...state,
+        listCleanup: {
+          ...state.listCleanup,
+          uspsFormat: Boolean(action.payload)
         }
       };
 
@@ -98,9 +135,15 @@ function appReducer(state, action) {
       };
 
     case actionTypes.LOAD_STATE:
+      // Saved state from before list cleanup existed has no listCleanup key,
+      // so merge it over the defaults instead of replacing them.
       return {
         ...state,
-        ...action.payload
+        ...action.payload,
+        listCleanup: {
+          ...initialState.listCleanup,
+          ...(action.payload.listCleanup || {})
+        }
       };
 
     default:
@@ -151,6 +194,31 @@ export function useAppContext() {
     throw new Error('useAppContext must be used within an AppProvider');
   }
   return context;
+}
+
+/**
+ * Rows that will actually print: the CSV rows minus any the user removed as
+ * duplicates. Also exposes the label rendering options derived from cleanup.
+ */
+export function usePrintableRows() {
+  const { state } = useAppContext();
+  const { csvData, listCleanup } = state;
+
+  const rows = useMemo(
+    () => getActiveRows(csvData.rows, listCleanup.excludedRowIndexes),
+    [csvData.rows, listCleanup.excludedRowIndexes]
+  );
+
+  const renderOptions = useMemo(
+    () => ({ usps: listCleanup.uspsFormat }),
+    [listCleanup.uspsFormat]
+  );
+
+  return {
+    rows,
+    removedCount: listCleanup.excludedRowIndexes.length,
+    renderOptions
+  };
 }
 
 // Helper hooks for common actions

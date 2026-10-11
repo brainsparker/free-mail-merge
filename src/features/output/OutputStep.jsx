@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useAppContext } from '../../context/AppContext';
+import { useAppContext, usePrintableRows } from '../../context/AppContext';
 import { LABEL_FORMATS } from '../../constants/label-formats';
 import { generatePrintableHTML, countLabels } from '../../lib/label-generator';
 import { downloadFile, generateFilename } from '../../lib/file-download';
@@ -7,15 +7,16 @@ import Button from '../../components/ui/Button';
 
 export default function OutputStep() {
   const { state } = useAppContext();
+  const { rows, removedCount, renderOptions } = usePrintableRows();
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState(null);
 
   const format = LABEL_FORMATS[state.selectedFormat];
 
-  // Count total labels
+  // Count total labels (after duplicate removal)
   const labelCount = useMemo(() => {
-    return countLabels(state.csvData.rows, state.columnMapping);
-  }, [state.csvData.rows, state.columnMapping]);
+    return countLabels(rows, state.columnMapping, renderOptions);
+  }, [rows, state.columnMapping, renderOptions]);
 
   // Calculate number of sheets needed
   const sheetsNeeded = format ? Math.ceil(labelCount / format.labelsPerSheet) : 0;
@@ -29,9 +30,10 @@ export default function OutputStep() {
       await new Promise((resolve) => setTimeout(resolve, 300));
 
       const html = generatePrintableHTML(
-        state.csvData.rows,
+        rows,
         state.columnMapping,
-        state.selectedFormat
+        state.selectedFormat,
+        renderOptions
       );
 
       const filename = generateFilename(state.selectedFormat);
@@ -50,9 +52,10 @@ export default function OutputStep() {
 
     try {
       const html = generatePrintableHTML(
-        state.csvData.rows,
+        rows,
         state.columnMapping,
-        state.selectedFormat
+        state.selectedFormat,
+        renderOptions
       );
 
       // Open in new window for print preview
@@ -99,6 +102,17 @@ export default function OutputStep() {
             <div className="text-xs sm:text-sm text-blue-700 mt-1">Label Format</div>
           </div>
         </div>
+        {(removedCount > 0 || renderOptions.usps) && (
+          <div className="mt-4 text-center text-xs sm:text-sm text-blue-800">
+            {removedCount > 0 && (
+              <span>
+                {removedCount} duplicate row{removedCount !== 1 ? 's' : ''} skipped
+              </span>
+            )}
+            {removedCount > 0 && renderOptions.usps && <span> · </span>}
+            {renderOptions.usps && <span>USPS formatting on</span>}
+          </div>
+        )}
       </div>
 
       {/* Download Buttons */}

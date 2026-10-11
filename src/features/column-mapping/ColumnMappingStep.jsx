@@ -3,11 +3,12 @@ import { useAppContext } from '../../context/AppContext';
 import { LABEL_FIELDS } from '../../constants/field-mappings';
 import { detectColumns } from '../../lib/column-detector';
 import ColumnMapper from './ColumnMapper';
+import ListCleanupPanel from './ListCleanupPanel';
 import LabelPreview from '../../components/LabelPreview/LabelPreview';
 
 export default function ColumnMappingStep() {
   const { state, dispatch, actions } = useAppContext();
-  const { csvData, columnMapping, autoDetectionConfidence } = state;
+  const { csvData, columnMapping, autoDetectionConfidence, listCleanup } = state;
 
   // Auto-detect columns on mount if not already done
   useEffect(() => {
@@ -80,15 +81,19 @@ export default function ColumnMappingStep() {
 
         {/* Live Preview */}
         <div>
-          <LabelPreview data={previewData} />
+          <LabelPreview data={previewData} usps={listCleanup.uspsFormat} />
 
           {csvData.rows.length > 0 && (
             <div className="mt-4 text-sm text-gray-600 text-center">
               Previewing row 1 of {csvData.rowCount}
+              {listCleanup.uspsFormat && ' (USPS formatting on)'}
             </div>
           )}
         </div>
       </div>
+
+      {/* Duplicate check and USPS formatting, shown once required fields are mapped */}
+      <ListCleanupPanel />
     </div>
   );
 }

@@ -1,4 +1,6 @@
-export default function LabelPreview({ data, formatKey = '5160' }) {
+import { formatFieldsUSPS, formatCityStateZipLine } from '../../lib/list-cleaner';
+
+export default function LabelPreview({ data, formatKey = '5160', usps = false }) {
   if (!data) {
     return (
       <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
@@ -7,12 +9,13 @@ export default function LabelPreview({ data, formatKey = '5160' }) {
     );
   }
 
+  const fields = usps ? formatFieldsUSPS(data) : data;
   const addressLines = [
-    data.name,
-    data.company,
-    data.addressLine1,
-    data.addressLine2,
-    [data.city, data.state, data.zip].filter(Boolean).join(', ')
+    fields.name,
+    fields.company,
+    fields.addressLine1,
+    fields.addressLine2,
+    formatCityStateZipLine(fields, { usps })
   ].filter(Boolean);
 
   return (
